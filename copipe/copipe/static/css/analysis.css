@@ -1,0 +1,11 @@
+.search_result {
+  display: none;
+}
+
+.analyze_result {
+  line-height: 2rem;
+}
+
+#searchResults {
+  margin-top: 5rem;
+}
