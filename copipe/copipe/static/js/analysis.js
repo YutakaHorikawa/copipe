@@ -1,7 +1,7 @@
 function sendData() {
     $('.search_result').css('display', 'none');
     $('#checkButton').css('display', 'none');
-
+    
     $.ajax({
       type: "POST",
       url: "/analysis/analyze/",
@@ -15,10 +15,13 @@ function sendData() {
       },
       dataType: "json",
       success: function(msg){
+          $('#loadingImg').remove()
           $('#checkButton').css('display', 'block');
           drawResult(msg);
       }
     });
+    $loading = $('<img src="/static/img/ajax-loader.gif" id="loadingImg" />');
+    $('#searchResults').append($loading);
 }
 
 function drawResult(result) {
