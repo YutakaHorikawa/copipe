@@ -4,8 +4,8 @@ import MeCab
 import requests
 import json
 
-SEARCH_SECREAT_KEY = 'AIzaSyAxmZ8I_b6lEn2dql8ZKeLfFX_OWhk8ODQ'
-SEARCH_ENGINE_ID = '015580778663029974765:ylq9z14qdhu'
+SEARCH_SECREAT_KEY = ''
+SEARCH_ENGINE_ID = ''
 
 class Yamaki(object):
 
