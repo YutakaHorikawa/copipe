@@ -18,8 +18,6 @@ class Yamaki(object):
         self._google_search = GoogleSearch()
 
     def cos(self, v1, v2):
-        print v1
-        print v2
         numerator = sum([v1[c] * v2[c] for c in v1 if c in v2])
         square = lambda x: x * x
         denominator =  math.sqrt(sum(map(square, v1.values())) * sum(map(square, v2.values())))
