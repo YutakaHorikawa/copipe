@@ -6,36 +6,43 @@
         Yamaki<small>(コピペチェックツール)</small>
         <hr>
     </h2>
-    <form action="{% url 'analysis_analyze' %}" method="post">
+    <form name="yamakiForm" action="{% url 'analysis_analyze' %}" method="post">
     {% csrf_token %}
 
     <div class="form-group">
         <label class="control-label" for="id_v1">文章</label>
         <div class=" ">
-            <textarea cols="100" rows="5" id="v1" placeholder="ここに文章を入力" name="v1"></textarea><br />
+            <textarea cols="100" rows="5" id="v1" placeholder="ここに文章を入力" name="v1" ng-model="v1" required></textarea><br />
+            <span ng-show="yamakiForm.v1.$error.required" ng-if="yamakiForm.v1.$untouched && yamakiForm.$submitted">入力してください</span>
         </div>
     </div>
 
     <div class="form-group">
         <label class="control-label  " for="id_v2">検索ワード</label>
         <div class=" ">
-            <input type="text" class=" form-control" id="v2" placeholder="検索ワードを入力" name="search_word">
+            <input type="text" class=" form-control" id="v2" placeholder="検索ワードを入力" name="search_word" ng-model="search_word" required>
+            <span ng-show="yamakiForm.search_word.$error.required" ng-if="yamakiForm.search_word.$untouched && yamakiForm.$submitted">入力してください</span>
         </div>
     </div>
 
     <div class="form-group">
         <div class="col-sm-12">
-            <input onClick="sendData()" id="checkButton" class="btn btn-primary" type="button" value="チェック" />
+            <input ng-click="sendData()" id="checkButton" class="btn btn-primary" type="button" value="チェック" />
         </div>
     </div>
 
     </form>
-
-
 </div>
+
 <section class="search_result span5">
     <hr>
     <div id="searchResults">
+       <div class="analyze_result well" ng-repeat="result in results"> +
+           <span class="title">Title: [[ result.title]]  </span>/
+           <span class="link">Link: [[ result.link ]] </span>
+           <span class="similarity">類似度: [[ result.similarity ]] </span><br />
+           <span class="snippet">本文: + [[ result.snippet ]] + </span><br />
+       </div>
     </div>
 </section>
 

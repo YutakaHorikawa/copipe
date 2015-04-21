@@ -1,47 +1,64 @@
-function sendData() {
-    $('.search_result').css('display', 'none');
-    $('#checkButton').css('display', 'none');
+
+var yamakiApp = angular.module('yamakiApp', []);
+
+/**
+ * Appの設定. httpリクエストヘッダーに追加情報
+ * DjangoのCSRF対策に必要なtokenを渡す
+ **/
+yamakiApp.config(function($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+});
+
+/**
+ * Appの設定
+ * 変数スコープのブロック構造を変更。
+ * デフォルトのままだとDjangoとかぶるため
+ **/
+yamakiApp.config(function($interpolateProvider) {
+    $interpolateProvider.startSymbol('[[');
+    $interpolateProvider.endSymbol(']]');
+});
+
+
+/**
+ * サーバーサイドにpostする処理をfactoryにまとめてみた
+ **/
+yamakiApp.factory('analyze', function($http) {
+    var search = function(params) {
+        //$.paramsが腑に落ちない
+        return $http.post('/analysis/analyze/', $.param(params)).then(function(response) {
+            return response.data;
+        });
+    };
+    return {
+        search: function(params) {
+            return search(params);
+        }
+    };
+
+});
+
+/**
+ * コントローラー
+ **/
+yamakiApp.controller('analysis', function ($scope, analyze) {
     
-    $.ajax({
-      type: "POST",
-      url: "/analysis/analyze/",
-      data: {
-          'v1': $('#v1').val(),
-          'search_word': $('#v2').val(),
-          'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val() 
-      },
-      headers: {
-        'X-CSRFToken': $("input[name='csrfmiddlewaretoken']").val()
-      },
-      dataType: "json",
-      success: function(msg){
-          $('#loadingImg').remove()
-          $('#checkButton').css('display', 'block');
-          drawResult(msg);
-      }
-    });
-    $loading = $('<img src="/static/img/ajax-loader.gif" id="loadingImg" />');
-    $('#searchResults').append($loading);
-}
+    // ボタンイベント
+    $scope.sendData = function() {
+        var params = {
+            'v1': $scope.v1,
+            'search_word': $scope.search_word,
+            'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+        };
 
-function drawResult(result) {
-    var $results, results, html, r;
-    $('.search_result').css('display', 'block');
-    $results = $('#searchResults');
-    results = result.message;   
-    $fragment = document.createFragment;
+        analyze.search(params).then(function(data) {
+            console.log(data.message);
+            $scope.results = data.message;
+        });
 
-    for (var i = 0, len = results.length; i < len; i++) {
-            r = results[i];
-            html = '' +
-            '   <div class="analyze_result well">' +
-            '       <span class="title">Title:' + r.title + '</span>/' +
-            '       <span class="link">Link:' + r.link + '</span>/' +
-            '       <span class="similarity">類似度:' + r.similarity + '</span><br />' +
-            '       <span class="snippet">本文:' + r.snippet + '</span><br />' +
-            '   </div>';
-           // html = html.replace(/[ !"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&'); 
-           $results.append($(html));
-    }
+    };
 
-}
+});
+
